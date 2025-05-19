@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-lang-key="allCertificatesTitle">معرض الشهادات | أحمد مكرم</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Inter:wght@400;500;600;700;800&family=Lora:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Cairo', 'Inter', sans-serif;
+            background: linear-gradient(180deg, #0f172a 0%, #020617 70%, #000000 100%);
+            color: #e2e8f0;
+            overflow-x: hidden;
+        }
+        .gradient-text {
+            background: linear-gradient(to right, #38bdf8, #818cf8, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .font-serif-display {
+            font-family: 'Lora', serif;
+        }
+        .glass-card {
+            background-color: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(51, 65, 85, 0.5);
+            border-radius: 0.75rem;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+        .gallery-carousel-wrapper { max-width: 1200px; margin-left: auto; margin-right: auto; }
+
+        /* Thumb Navigation - Vertical for LG+, Horizontal for smaller */
+        .gallery-thumb-nav {
+            position: relative;
+            transition: all 0.3s ease-in-out;
+        }
+        /* Vertical line for LG screens and up */
+        .lg\:gallery-thumb-nav-vertical::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            bottom: 10px;
+            width: 3px;
+            background: linear-gradient(to bottom, #38bdf8, #a78bfa);
+            border-radius: 1.5px;
+            z-index: 0;
+            opacity: 0.7;
+        }
+        html[dir="ltr"] .lg\:gallery-thumb-nav-vertical::before { left: 10px; }
+        html[dir="rtl"] .lg\:gallery-thumb-nav-vertical::before { right: 10px; }
+
+        .gallery-thumb-item {
+            width: 56px; /* Default size for mobile */
+            height: 56px;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            position: relative;
+            z-index: 1;
+            opacity: 0.7;
+            flex-shrink: 0; /* Important for horizontal scroll */
+        }
+        /* Spacing for horizontal layout on mobile */
+        .gallery-thumb-nav-horizontal .gallery-thumb-item {
+            margin-left: 0.5rem;
+            margin-right: 0.5rem;
+        }
+        html[dir="rtl"] .gallery-thumb-nav-horizontal .gallery-thumb-item {
+            margin-left: 0.5rem;
+            margin-right: 0.5rem; /* Keep symmetrical or adjust as needed */
+        }
+         /* Spacing for vertical layout on desktop */
+        .lg\:gallery-thumb-nav-vertical .gallery-thumb-item {
+            margin-bottom: 1.5rem;
+        }
+
+
+        .gallery-thumb-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            filter: grayscale(50%);
+            transition: filter 0.3s ease;
+        }
+        .gallery-thumb-item.active {
+            border-color: #38bdf8;
+            transform: scale(1.15); /* Slightly smaller active scale for mobile */
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.5);
+            opacity: 1;
+        }
+        .lg\.gallery-thumb-item.active { /* Larger scale for desktop */
+             transform: scale(1.2);
+             box-shadow: 0 0 20px rgba(56, 189, 248, 0.6);
+        }
+        .gallery-thumb-item.active img {
+            filter: grayscale(0%);
+        }
+        .gallery-thumb-item:hover:not(.active) {
+            border-color: rgba(129, 140, 248, 0.5);
+            transform: scale(1.05); /* Smaller hover scale for mobile */
+            opacity: 0.9;
+        }
+        .lg\.gallery-thumb-item:hover:not(.active) {
+             transform: scale(1.1);
+        }
+        .gallery-thumb-item:hover:not(.active) img {
+            filter: grayscale(20%);
+        }
+
+        .gallery-main-image-slider {
+            position: relative;
+            overflow: hidden;
+            perspective: 1800px;
+            height: 300px; /* Default height for mobile */
+        }
+        @media (min-width: 640px) { /* sm screens */
+            .gallery-main-image-slider { height: 400px; }
+        }
+        @media (min-width: 1024px) { /* lg screens */
+            .gallery-main-image-slider { height: 480px; }
+        }
+
+        .gallery-slides-track {
+            display: flex;
+            height: 100%;
+            transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        .gallery-slide {
+            width: 100%;
+            flex-shrink: 0;
+            height: 100%;
+            box-sizing: border-box;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transform: scale(0.95) translateY(20px);
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+        }
+        .gallery-slide.active-slide { opacity: 1; transform: scale(1) translateY(0); }
+        .gallery-slide img {
+            max-width: 90%; /* Allow image to be a bit larger on mobile */
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25), 0 4px 10px rgba(0,0,0,0.20); /* Adjusted shadow */
+            transition: transform 0.4s ease-in-out;
+        }
+        .lg\.gallery-slide img { max-width: 85%; } /* Revert to 85% on larger screens */
+
+        .gallery-slide.active-slide img:hover { transform: scale(1.03); }
+
+        .gallery-item-details { min-height: 80px; padding-top: 0.75rem; } /* Adjusted for mobile */
+        .lg\.gallery-item-details { min-height: 100px; padding-top: 1rem; }
+        .gallery-item-details h3 { color: #e2e8f0; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
+        .gallery-item-details p { color: #cbd5e1; }
+
+        /* Custom scrollbar for horizontal thumbnails on mobile */
+        .thumb-horizontal-scroll::-webkit-scrollbar { height: 6px; }
+        .thumb-horizontal-scroll::-webkit-scrollbar-track { background: rgba(51, 65, 85, 0.3); border-radius: 3px; }
+        .thumb-horizontal-scroll::-webkit-scrollbar-thumb { background: rgba(129, 140, 248, 0.6); border-radius: 3px; }
+        .thumb-horizontal-scroll::-webkit-scrollbar-thumb:hover { background: rgba(129, 140, 248, 0.8); }
+        /* Custom scrollbar for vertical thumbnails on desktop */
+        .lg\:thumb-vertical-scroll::-webkit-scrollbar { width: 8px; }
+        .lg\:thumb-vertical-scroll::-webkit-scrollbar-track { background: rgba(51, 65, 85, 0.3); border-radius: 4px; }
+        .lg\:thumb-vertical-scroll::-webkit-scrollbar-thumb { background: rgba(129, 140, 248, 0.6); border-radius: 4px; }
+        .lg\:thumb-vertical-scroll::-webkit-scrollbar-thumb:hover { background: rgba(129, 140, 248, 0.8); }
+
+
+        .styled-button { display: inline-flex; align-items: center; justify-content: center; padding: 0.75rem 1.5rem; border-radius: 0.5rem; font-weight: 600; transition: all 0.3s ease; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .styled-button.primary { background: linear-gradient(to right, #38bdf8, #818cf8); color: white; }
+        .styled-button.primary:hover { background: linear-gradient(to right, #0ea5e9, #6366f1); box-shadow: 0 6px 12px rgba(56, 189, 248, 0.3); transform: translateY(-2px); }
+
+        .carousel-nav-button {
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(5px);
+            color: #e2e8f0;
+            border: 1px solid rgba(51, 65, 85, 0.7);
+            border-radius: 50%;
+            width: 2.5rem; /* Smaller for mobile */
+            height: 2.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+        }
+        .lg\.carousel-nav-button { /* Larger for desktop */
+            width: 3rem;
+            height: 3rem;
+        }
+        .carousel-nav-button:hover:not(:disabled) { background: rgba(56, 189, 248, 0.3); border-color: #38bdf8; transform: scale(1.1); }
+        .carousel-nav-button:disabled { background: rgba(51, 65, 85, 0.4); cursor: not-allowed; opacity: 0.6; }
+        .carousel-nav-button i { font-size: 1rem; } /* Smaller icon for mobile */
+        .lg\.carousel-nav-button i { font-size: 1.25rem; } /* Larger icon for desktop */
+
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="py-4 px-4 sm:px-6 lg:px-8 bg-slate-900/80 backdrop-blur-lg shadow-md sticky top-0 z-50">
+        <div class="container mx-auto flex justify-between items-center">
+            <a href="index.html" class="text-2xl sm:text-3xl font-bold gradient-text" data-lang-key="navBrand">أحمد مكرم</a>
+            <nav class="flex items-center space-x-3 sm:space-x-6 rtl:space-x-reverse rtl:sm:space-x-reverse">
+                <a href="index.html#home" class="text-sm sm:text-base hover:text-sky-400 transition-colors" data-lang-key="navHome">الرئيسية</a>
+                <a href="index.html" class="styled-button primary text-xs sm:text-sm px-3 py-1.5 sm:px-4 sm:py-2" data-lang-key="backToMainPortfolio">
+                    <i class="fas fa-arrow-left text-xs sm:text-sm mr-1 rtl:ml-1 rtl:mr-0"></i> <span class="link-text">العودة للملف الشخصي</span>
+                </a>
+                 <select id="language-toggle" class="ml-2 sm:ml-4 bg-slate-700 text-slate-200 border border-slate-600 rounded-md py-1 px-1.5 sm:py-1.5 sm:px-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer">
+                    <option value="ar">العربية</option>
+                    <option value="en">English</option>
+                </select>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto py-10 sm:py-16 px-4">
+        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold mb-12 sm:mb-16 lg:mb-20 text-center gradient-text" data-lang-key="allCertificatesTitle" data-aos="fade-down">معرض الشهادات</h1>
+
+        <div class="gallery-carousel-wrapper relative flex flex-col items-center gap-y-8" data-aos="fade-up" data-aos-delay="200">
+            <div class="gallery-main-carousel-container relative w-full max-w-2xl lg:max-w-3xl glass-card p-4 sm:p-6 md:p-8 order-1" data-aos="fade-up" data-aos-delay="300">
+                <div class="gallery-main-image-slider relative overflow-hidden mb-4 sm:mb-6 rounded-lg">
+                    <div class="gallery-slides-track flex">
+                        </div>
+                </div>
+                <div class="gallery-item-details text-center">
+                    <h3 class="text-xl sm:text-2xl md:text-3xl font-serif-display font-bold mb-2" id="gallery-item-title"></h3>
+                    <p class="text-xs sm:text-sm md:text-base leading-relaxed min-h-[3em] sm:min-h-[4em]" id="gallery-item-description"></p>
+                </div>
+                <button id="gallery-prev-btn" aria-label="Previous Certificate" class="carousel-nav-button lg:carousel-nav-button absolute top-1/2 transform -translate-y-1/2 left-2 sm:left-3 md:left-4 lg:-left-5"><i class="fas fa-chevron-left"></i></button>
+                <button id="gallery-next-btn" aria-label="Next Certificate" class="carousel-nav-button lg:carousel-nav-button absolute top-1/2 transform -translate-y-1/2 right-2 sm:right-3 md:right-4 lg:-right-5"><i class="fas fa-chevron-right"></i></button>
+            </div>
+
+            <nav class="gallery-thumb-nav w-full lg:w-[120px] order-2 flex items-center justify-start lg:justify-center lg:flex-col
+                        overflow-x-auto lg:overflow-x-hidden lg:overflow-y-auto lg:max-h-[480px]
+                        py-4 glass-card lg:p-4 thumb-horizontal-scroll lg:thumb-vertical-scroll
+                        lg:gallery-thumb-nav-vertical gallery-thumb-nav-horizontal"
+                 data-aos="fade-up" data-aos-delay="400">
+                </nav>
+        </div>
+    </main>
+
+    <footer class="mt-16 sm:mt-24 py-10 px-4 sm:px-6 lg:px-8 text-center bg-black/70 border-t border-slate-700/70">
+        <div class="container mx-auto">
+            <p class="text-sm text-slate-400" data-lang-key="footerText">&copy; <span id="currentYear"></span> أحمد مكرم الصعيدي. جميع الحقوق محفوظة.</p>
+        </div>
+    </footer>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        const certificatesData = [
+            {img: "images/certificate (1).jpg", titleKey: "cert1Title", defaultTitle: "شهادة تطوير الويب المتقدمة", descriptionKey: "cert1Desc", defaultDescription: "وصف تفصيلي لشهادة تطوير الويب المتقدمة يوضح المهارات المكتسبة."},
+            {img: "images/certificate (3).jpg", titleKey: "cert2Title", defaultTitle: "شهادة تصميم واجهات المستخدم (UI/UX)", descriptionKey: "cert2Desc", defaultDescription: "هذه الشهادة تغطي مبادئ تصميم الواجهات وتجربة المستخدم."},
+            {img: "images/certificate (5).jpg", titleKey: "cert3Title", defaultTitle: "شهادة بايثون للمطورين", descriptionKey: "cert3Desc", defaultDescription: "شهادة متقدمة في لغة بايثون وتطبيقاتها المختلفة."},
+            {img: "images/certificate (9).jpg", titleKey: "cert4Title", defaultTitle: "شهادة JavaScript الاحترافية", descriptionKey: "cert4Desc", defaultDescription: "تأهيل احترافي في JavaScript لتطوير تطبيقات ويب تفاعلية."},
+            {img: "images/certificate (10).jpg", titleKey: "cert5Title", defaultTitle: "شهادة إدارة قواعد البيانات", descriptionKey: "cert5Desc", defaultDescription: "تغطي هذه الشهادة إدارة وتصميم قواعد البيانات بكفاءة."},
+            {img: "images/certificate (11).jpg", titleKey: "cert6Title", defaultTitle: "شهادة التعليق الصوتي المتقدم", descriptionKey: "cert6Desc", defaultDescription: "شهادة في فنون التعليق الصوتي المتقدمة لمختلف المشاريع."},
+            {img: "images/certificate (12).jpg", titleKey: "cert7Title", defaultTitle: "شهادة تصميم الجرافيك الإبداعي", descriptionKey: "cert7Desc", defaultDescription: "تركز على استخدام الأدوات والتقنيات الحديثة في التصميم الجرافيكي."},
+            {img: "images/certificate (13).jpg", titleKey: "cert8Title", defaultTitle: "شهادة Node.js للتطبيقات الخلفية", descriptionKey: "cert8Desc", defaultDescription: "تطوير تطبيقات خلفية قوية وفعالة باستخدام Node.js."},
+            {img: "images/certificate (14).jpg", titleKey: "cert9Title", defaultTitle: "شهادة React لتطوير الواجهات", descriptionKey: "cert9Desc", defaultDescription: "بناء واجهات مستخدم ديناميكية باستخدام مكتبة React."},
+            {img: "images/certificate (15).jpg", titleKey: "cert10Title", defaultTitle: "شهادة Django لتطبيقات الويب", descriptionKey: "cert10Desc", defaultDescription: "تطوير تطبيقات ويب متكاملة باستخدام إطار العمل Django."},
+            {img: "images/certificate (16).jpg", titleKey: "cert11Title", defaultTitle: "شهادة أمن تطبيقات الويب", descriptionKey: "cert11Desc", defaultDescription: "تأمين تطبيقات الويب ضد الثغرات والهجمات الشائعة."},
+            {img: "images/certificate (17).jpg", titleKey: "cert12Title", defaultTitle: "شهادة التسويق الرقمي الأساسية", descriptionKey: "cert12Desc", defaultDescription: "مبادئ وأساسيات التسويق الرقمي الناجح عبر الإنترنت."}
+        ];
+
+        const translations = {
+            ar: {
+                allCertificatesTitle: "معرض الشهادات",
+                navBrand: "أحمد مكرم",
+                navHome: "الرئيسية",
+                backToMainPortfolio: "العودة للملف الشخصي",
+                footerText: `&copy; ${new Date().getFullYear()} أحمد مكرم الصعيدي. جميع الحقوق محفوظة.`,
+                cert1Title: "شهادة تطوير الويب المتقدمة", cert1Desc: "وصف تفصيلي لشهادة تطوير الويب المتقدمة يوضح المهارات المكتسبة.",
+                cert2Title: "شهادة تصميم واجهات المستخدم (UI/UX)", cert2Desc: "هذه الشهادة تغطي مبادئ تصميم الواجهات وتجربة المستخدم.",
+                cert3Title: "شهادة بايثون للمطورين", cert3Desc: "شهادة متقدمة في لغة بايثون وتطبيقاتها المختلفة.",
+                cert4Title: "شهادة JavaScript الاحترافية", cert4Desc: "تأهيل احترافي في JavaScript لتطوير تطبيقات ويب تفاعلية.",
+                cert5Title: "شهادة إدارة قواعد البيانات", cert5Desc: "تغطي هذه الشهادة إدارة وتصميم قواعد البيانات بكفاءة.",
+                cert6Title: "شهادة التعليق الصوتي المتقدم", cert6Desc: "شهادة في فنون التعليق الصوتي المتقدمة لمختلف المشاريع.",
+                cert7Title: "شهادة تصميم الجرافيك الإبداعي", cert7Desc: "تركز على استخدام الأدوات والتقنيات الحديثة في التصميم الجرافيكي.",
+                cert8Title: "شهادة Node.js للتطبيقات الخلفية", cert8Desc: "تطوير تطبيقات خلفية قوية وفعالة باستخدام Node.js.",
+                cert9Title: "شهادة React لتطوير الواجهات", cert9Desc: "بناء واجهات مستخدم ديناميكية باستخدام مكتبة React.",
+                cert10Title: "شهادة Django لتطبيقات الويب", cert10Desc: "تطوير تطبيقات ويب متكاملة باستخدام إطار العمل Django.",
+                cert11Title: "شهادة أمن تطبيقات الويب", cert11Desc: "تأمين تطبيقات الويب ضد الثغرات والهجمات الشائعة.",
+                cert12Title: "شهادة التسويق الرقمي الأساسية", cert12Desc: "مبادئ وأساسيات التسويق الرقمي الناجح عبر الإنترنت.",
+            },
+            en: {
+                allCertificatesTitle: "Certificates Gallery",
+                navBrand: "Ahmed Makram",
+                navHome: "Home",
+                backToMainPortfolio: "Back to Portfolio",
+                footerText: `&copy; ${new Date().getFullYear()} Ahmed Makram El-Saeedy. All rights reserved.`,
+                cert1Title: "Advanced Web Development Certificate", cert1Desc: "Detailed description of the advanced web development certificate highlighting acquired skills.",
+                cert2Title: "UI/UX Design Certificate", cert2Desc: "This certificate covers principles of UI and UX design.",
+                cert3Title: "Python for Developers Certificate", cert3Desc: "Advanced certificate in Python language and its various applications.",
+                cert4Title: "Professional JavaScript Certificate", cert4Desc: "Professional qualification in JavaScript for developing interactive web applications.",
+                cert5Title: "Database Management Certificate", cert5Desc: "This certificate covers efficient database management and design.",
+                cert6Title: "Advanced Voice Over Certificate", cert6Desc: "Certificate in advanced voice-over techniques for various projects.",
+                cert7Title: "Creative Graphic Design Certificate", cert7Desc: "Focuses on using modern tools and techniques in graphic design.",
+                cert8Title: "Node.js Backend Certificate", cert8Desc: "Developing robust and efficient backend applications using Node.js.",
+                cert9Title: "React Frontend Certificate", cert9Desc: "Building dynamic user interfaces using the React library.",
+                cert10Title: "Django Web Apps Certificate", cert10Desc: "Developing comprehensive web applications using the Django framework.",
+                cert11Title: "Web App Security Certificate", cert11Desc: "Securing web applications against common vulnerabilities and attacks.",
+                cert12Title: "Digital Marketing Basics Certificate", cert12Desc: "Principles and fundamentals of successful online digital marketing.",
+            }
+        };
+
+        let currentGalleryIndex = 0;
+        const gallerySlidesTrack = document.querySelector('.gallery-slides-track');
+        const galleryThumbNav = document.querySelector('.gallery-thumb-nav');
+        const galleryItemTitle = document.getElementById('gallery-item-title');
+        const galleryItemDescription = document.getElementById('gallery-item-description');
+        const galleryPrevBtn = document.getElementById('gallery-prev-btn');
+        const galleryNextBtn = document.getElementById('gallery-next-btn');
+
+        function renderGallery() {
+            if (!gallerySlidesTrack || !galleryThumbNav) {
+                console.error("Gallery track or thumbnav not found! Ensure the HTML structure is correct.");
+                return;
+            }
+            console.log("[DEBUG] certificatesData at the start of renderGallery:", JSON.stringify(certificatesData.map(c => ({ img: c.img, titleKey: c.titleKey }))));
+
+            gallerySlidesTrack.innerHTML = '';
+            galleryThumbNav.innerHTML = '';
+            const currentLang = document.documentElement.lang || 'ar';
+
+            certificatesData.forEach((cert, index) => {
+                const altText = translations[currentLang]?.[cert.titleKey] || cert.defaultTitle;
+                const originalImagePathFromData = cert.img;
+                // console.log(`[DEBUG] For certificate "${altText}" (index ${index}): - Original path from certificatesData: "${originalImagePathFromData}"`);
+
+                const slide = document.createElement('div');
+                slide.className = 'gallery-slide';
+                slide.innerHTML = `<img src="${originalImagePathFromData}" alt="${altText}" onerror="this.onerror=null; this.src='https://placehold.co/700x500/0f172a/e2e8f0?text=Image+Not+Found&font=cairo&font-size=20'; console.error('Error loading MAIN image: ${originalImagePathFromData}')">`;
+                gallerySlidesTrack.appendChild(slide);
+
+                const thumb = document.createElement('div');
+                // Add lg specific class for scale effect control
+                thumb.className = 'gallery-thumb-item lg:gallery-thumb-item';
+                thumb.dataset.index = index;
+                thumb.setAttribute('aria-label', `View certificate: ${altText}`);
+                thumb.innerHTML = `<img src="${originalImagePathFromData}" alt="Thumbnail ${index + 1}: ${altText}" onerror="this.onerror=null; this.src='https://placehold.co/64x64/0f172a/e2e8f0?text=${index+1}&font=cairo'; console.error('Error loading THUMBNAIL image: ${originalImagePathFromData}')">`;
+                thumb.addEventListener('click', () => { goToSlide(index); });
+                galleryThumbNav.appendChild(thumb);
+            });
+
+            if (certificatesData.length > 0 && gallerySlidesTrack.children.length > currentGalleryIndex && gallerySlidesTrack.children[currentGalleryIndex]) {
+                 gallerySlidesTrack.children[currentGalleryIndex].classList.add('active-slide');
+            } else if (certificatesData.length > 0) {
+                console.warn("[DEBUG] Could not set initial active slide. currentGalleryIndex or children might be out of bounds.");
+            }
+            updateGalleryDisplay();
+        }
+
+        function updateGalleryDisplay() {
+            const lang = document.documentElement.lang || 'ar';
+            const numSlides = certificatesData.length;
+
+             if (numSlides === 0) {
+                if (galleryItemTitle) galleryItemTitle.textContent = lang === 'ar' ? "لا توجد شهادات لعرضها" : "No certificates to display";
+                if (galleryItemDescription) galleryItemDescription.textContent = "";
+                if(galleryPrevBtn) galleryPrevBtn.disabled = true;
+                if(galleryNextBtn) galleryNextBtn.disabled = true;
+                if(gallerySlidesTrack) gallerySlidesTrack.style.transform = 'translateX(0%)';
+                return;
+            }
+
+            if (currentGalleryIndex < 0 || currentGalleryIndex >= numSlides) {
+                currentGalleryIndex = 0;
+            }
+            const currentCert = certificatesData[currentGalleryIndex];
+            if (!currentCert) {
+                console.error("[DEBUG] Current certificate data is undefined for index:", currentGalleryIndex);
+                return;
+            }
+
+            if(gallerySlidesTrack) {
+                const isRTL = document.documentElement.dir === 'rtl';
+                let translateXValue;
+                translateXValue = (isRTL ? currentGalleryIndex : -currentGalleryIndex) * 100;
+                gallerySlidesTrack.style.transform = `translateX(${translateXValue}%)`;
+                // console.log(`[DEBUG] RTL: ${isRTL}, Index: ${currentGalleryIndex}, TranslateX: ${translateXValue}%`);
+
+                Array.from(gallerySlidesTrack.children).forEach((slide, idx) => {
+                    slide.classList.toggle('active-slide', idx === currentGalleryIndex);
+                });
+            }
+
+            document.querySelectorAll('.gallery-thumb-item').forEach((thumb, index) => {
+                thumb.classList.toggle('active', index === currentGalleryIndex);
+            });
+
+            if (galleryItemTitle) galleryItemTitle.textContent = translations[lang]?.[currentCert.titleKey] || currentCert.defaultTitle;
+            if (galleryItemDescription) galleryItemDescription.textContent = translations[lang]?.[currentCert.descriptionKey] || currentCert.defaultDescription;
+
+            if(galleryPrevBtn) galleryPrevBtn.disabled = currentGalleryIndex === 0;
+            if(galleryNextBtn) galleryNextBtn.disabled = currentGalleryIndex === numSlides - 1;
+
+            const activeThumb = galleryThumbNav?.querySelector(`.gallery-thumb-item[data-index="${currentGalleryIndex}"]`);
+            if (activeThumb && galleryThumbNav) {
+                // For horizontal scroll on mobile
+                if (window.innerWidth < 1024 && galleryThumbNav.scrollWidth > galleryThumbNav.clientWidth) {
+                    const navRect = galleryThumbNav.getBoundingClientRect();
+                    const thumbRect = activeThumb.getBoundingClientRect();
+                    const scrollLeft = galleryThumbNav.scrollLeft;
+                    const thumbOffsetLeft = activeThumb.offsetLeft; // Relative to scrollable parent
+                    const thumbWidth = activeThumb.offsetWidth;
+
+                    if (thumbOffsetLeft < scrollLeft) {
+                        galleryThumbNav.scrollLeft = thumbOffsetLeft - 10;
+                    } else if (thumbOffsetLeft + thumbWidth > scrollLeft + navRect.width) {
+                        galleryThumbNav.scrollLeft = thumbOffsetLeft + thumbWidth - navRect.width + 10;
+                    }
+                }
+                // For vertical scroll on desktop
+                else if (window.innerWidth >= 1024 && galleryThumbNav.scrollHeight > galleryThumbNav.clientHeight) {
+                    const navRect = galleryThumbNav.getBoundingClientRect();
+                    const scrollTop = galleryThumbNav.scrollTop;
+                    const thumbOffsetTop = activeThumb.offsetTop;
+                    const thumbHeight = activeThumb.offsetHeight;
+
+                    if (thumbOffsetTop < scrollTop) {
+                        galleryThumbNav.scrollTop = thumbOffsetTop - 10;
+                    } else if (thumbOffsetTop + thumbHeight > scrollTop + navRect.height) {
+                        galleryThumbNav.scrollTop = thumbOffsetTop + thumbHeight - navRect.height + 10;
+                    }
+                }
+            }
+        }
+
+        function goToSlide(index) {
+            currentGalleryIndex = Math.max(0, Math.min(index, certificatesData.length - 1));
+            updateGalleryDisplay();
+        }
+
+        function setupGalleryEventListeners() {
+            if(galleryPrevBtn) {
+                galleryPrevBtn.addEventListener('click', () => {
+                    if (currentGalleryIndex > 0) {
+                        goToSlide(currentGalleryIndex - 1);
+                    }
+                });
+            }
+            if(galleryNextBtn) {
+                galleryNextBtn.addEventListener('click', () => {
+                    if (currentGalleryIndex < certificatesData.length - 1) {
+                        goToSlide(currentGalleryIndex + 1);
+                    }
+                });
+            }
+             window.addEventListener('resize', updateGalleryDisplay); // Update on resize for responsive adjustments
+        }
+
+        function setLanguageGallery(selectedLang) {
+            const langToggle = document.getElementById('language-toggle');
+            if (langToggle) langToggle.value = selectedLang;
+
+            document.documentElement.lang = selectedLang;
+            document.documentElement.dir = selectedLang === 'ar' ? 'rtl' : 'ltr';
+            localStorage.setItem('portfolioLanguage', selectedLang);
+
+            document.querySelectorAll('[data-lang-key]').forEach(el => {
+                const key = el.getAttribute('data-lang-key');
+                if (translations[selectedLang] && translations[selectedLang][key]) {
+                     let content = translations[selectedLang][key];
+                    const iconElement = el.querySelector('i.fas');
+                    const textSpan = el.querySelector('.link-text');
+
+                    if (textSpan && iconElement) {
+                        textSpan.textContent = content;
+                        if (selectedLang === 'ar') {
+                            iconElement.classList.remove('mr-1', 'mr-2'); iconElement.classList.add('ml-1', 'ml-2'); // Adjusted for new structure
+                            el.classList.add('flex-row-reverse');
+                        } else {
+                            iconElement.classList.remove('ml-1', 'ml-2'); iconElement.classList.add('mr-1', 'mr-2');
+                            el.classList.remove('flex-row-reverse');
+                        }
+                    } else {
+                        el.innerHTML = content;
+                    }
+                }
+            });
+            renderGallery();
+            AOS.refresh();
+        }
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+            AOS.init({
+                duration: 800,
+                once: true,
+                offset: 50,
+                easing: 'ease-in-out-quad',
+            });
+
+            const savedLang = localStorage.getItem('portfolioLanguage') || 'ar';
+            const langToggle = document.getElementById('language-toggle');
+
+            if (langToggle) {
+                langToggle.value = savedLang;
+                langToggle.addEventListener('change', function () { setLanguageGallery(this.value); });
+            }
+
+            setLanguageGallery(savedLang);
+            setupGalleryEventListeners();
+        });
+
+    </script>
+</body>
+</html>
